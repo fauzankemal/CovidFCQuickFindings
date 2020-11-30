@@ -11,7 +11,6 @@ Project         : 2020_UNDP_COVID
 Email           : fkemal@smeru.or.id, mandrina@smeru.or.id
 Date created	: 02/11/2020
 Date modified	: 30/11/2020
-Version			: 1
 --------------------------------------------------------------------------------
 Simple tabulations and summary for Fullscale-survey's quick finding analysis
 -------------------------------------------------------------------------------- */
@@ -34,8 +33,10 @@ use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Quest
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
-
-
+/*------------------------------------------------------------------------------
+Keep completed Observations only
+-------------------------------------------------------------------------------- */
+keep if j1==1
 
 /*------------------------------------------------------------------------------
 Creating dummy
