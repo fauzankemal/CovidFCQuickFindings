@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020_Adjusted_Weighted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -2200,20 +2200,22 @@ Part: Household characteristics
 -------------------------------------------------------------------------------*/ 
 {
 gen hc01=0
-	replace hc01=1 if inrange(b3_usia,20,29)
-	replace hc01=2 if inrange(b3_usia,30,39)
-	replace hc01=3 if inrange(b3_usia,40,49)
-	replace hc01=4 if inrange(b3_usia,50,59)	
-	replace hc01=5 if inrange(b3_usia,60,89)	
+	replace hc01=1 if inrange(b3_usia,15,20)
+	replace hc01=2 if inrange(b3_usia,20,29)
+	replace hc01=3 if inrange(b3_usia,30,39)
+	replace hc01=4 if inrange(b3_usia,40,49)
+	replace hc01=5 if inrange(b3_usia,50,59)	
+	replace hc01=6 if inrange(b3_usia,60,89)
+	replace hc01=7 if inrange(b3_usia,98,98)	
 	la var hc01 "hc01. HH head agegroup"
-	la de hc01 1 "20-29yo" 2 "30-39yo" 3 "40-49yo" 4 "50-59yo" 5 "60yo+", modify
+	la de hc01 1 "15-20 yo" 2 "20-29yo" 3 "30-39yo" 4 "40-49yo" 5 "50-59yo" 6 "60yo+" 7 "Don't know", modify
 	la val hc01 hc01
 
 gen hc02=0
 	replace hc02=1 if inrange(b7,1,2)
 	replace hc02=2 if inrange(b7,3,4)
 	replace hc02=3 if inrange(b7,5,6)
-	replace hc02=4 if inrange(b7,7,20)	
+	replace hc02=4 if inrange(b7,7,50)	
 	la var hc02 "hc02. HH size group"
 	la de hc02 1 "1-2 members" 2 "3-4 members" 3 "5-6 members" 4 "7 members or more", modify
 	la val hc02 hc02
@@ -2417,29 +2419,15 @@ local group_h "hc17"
 local group_i "hc16a" 
 local group_j "hc20"
 
+
+*Round weight*
+gen weight_2_r = int(weight_2)
+recast long weight_2_r
 tempfile appended
 save `appended'
 
+*set trace on
 
-/*------------------------------------------------------------------------------
-Part: Methodology
--------------------------------------------------------------------------------*/ 
-
-
-local figvar id1 id5
-local fig id1 id5
-
-forv x=1/2 {
-	local a: word `x' of `figvar'
-	local b: word `x' of `fig'
-	tabout `a' using "`b'.csv" , c(freq col) clab(count pct) format(2) replace
-	import delimited using "`b'.csv", varnames(1) clear
-	export excel using "undp20_quickfinding_Profile.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-	sleep 100
-	rm "`b'.csv"
-	use `appended', clear
-	}
-	
 /*------------------------------------------------------------------------------
 Part: Household Characteristics
 -------------------------------------------------------------------------------*/ 
@@ -2457,649 +2445,26 @@ foreach no in 7 {
 		rm "`b'.csv"
 		use `appended', clear
 		
-		}	
 
-}
-/*------------------------------------------------------------------------------
-Part: Biggest impact caused by COVID-19
--------------------------------------------------------------------------------*/ 
-*set trace on
-local figvar b10 
-local fig 9.1
-foreach no in 9 {
-	forv x=1/1 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		*Weighted - Analytical Weight*
+		tabout `a' using `b'_aw.csv if `a'!=96 [aweight=weight_1], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'_aw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_aw") cell(C1) sheetmodify firstrow(varlabels)
 		sleep 100
-		rm "`b'.csv"
+		rm "`b'_aw.csv"
 		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d g j{
 
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}	
+		*Weighted - Frequency Weight*
+		tabout `a' using `b'_fw.csv if `a'!=96 [fweight=weight_2_r], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'_fw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_fw") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'_fw.csv"
+		use `appended', clear
+		}
 
 }
 
-
-/*------------------------------------------------------------------------------
-Part: Impact on household income: current condition
--------------------------------------------------------------------------------*/ 
-local figvar_m d8 h1 
-local fig_m 10.1 10.2
-local figvar hc16 hc18
-local fig 10.3 10.4
-
-foreach no in 10a {
-forval x=1/2 {
-	use `appended', clear
-	local a: word `x' of `figvar_m'
-	local b: word `x' of `fig_m'
-	#delimit ;
-	eststo clear;
-	eststo: qui: estpost summ `a'_*;
-	esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-	addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-	#delimit cr
-	import delimited using "`b'.csv", varnames(1) clear
-	export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-	sleep 100
-	rm "`b'.csv"
-	use `appended', clear
-
-*Based on vulnerable groups*
-	foreach group in b c d e j{
-		#delimit ;
-		eststo clear;
-		bys `group_`group'':eststo: qui: estpost summ `a'_*;
-		esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'`group'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'`group'.csv"
-		use `appended', clear	
-		}
-
-	}
-
-
-	forv x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d g j{
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}	
-	}
-/*------------------------------------------------------------------------------
-Part: Impact on household income: impact
--------------------------------------------------------------------------------*/ 
-local figvar d9 im01 d5
-local fig 10.5 10.6 10.7 
-local figvar_m d6 d7
-local fig_m 10.8 10.9
-
-foreach no in 10b {
-	forv x=1/3 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d g j {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}	
-
-
-	forval x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d g j {
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}
-
-	}
-
-/*------------------------------------------------------------------------------
-Part: Impact on household employment: current condition
--------------------------------------------------------------------------------*/ 
-local figvar h3 h4 h10 h11 h13 h14 
-local fig 11.1 11.2 11.3 11.4 11.5 11.6
-
-foreach no in 11a {
-	forv x=1/6 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96 , c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d g {
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}	
-	}
-/*------------------------------------------------------------------------------
-Part: Impact on household employment: impact
--------------------------------------------------------------------------------*/ 
-
-local figvar h15 h6 h7 h8 h9 h20 h21
-local fig 11.7 11.8 11.9 11.10 11.11 11.12 11.13
-
-foreach no in 11b {
-	forv x=1/7{
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96, c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-
-	*Based on Vulnerable groups*
-		foreach group in b c d g {
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-
-
-
-/*------------------------------------------------------------------------------
-Part: Impact on Household Small Business
--------------------------------------------------------------------------------*/ 	
-local figvar i1 i2 i4 i13
-local fig 12.1 12.2 12.3 12.4
-
-local figvar_m i3 i7 i8 i12
-local fig_m 12.5 12.6 12.7 12.8
-
-foreach no in 12 {
-
-	forv x=1/4 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		sleep 100
-		tabout `a' using "`b'.csv" if `a'!=96, c(freq col) clab(n pct) format(2) replace
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-
-
-	forval x=1/4 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-	}
-
-
-/*------------------------------------------------------------------------------
-Part: Impact on Food Security
--------------------------------------------------------------------------------*/ 
-*set trace on
-
-local figvar_q d2 d13
-local fig_q 13.1 13.2
-
-foreach no in 13 {
-	forv x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar_q'
-		local b: word `x' of `fig_q'
-		sleep 100
-		local `a'label "`:var l `a''"
-		tabm `a'*, replace
-		la var _stack "`a'"
-		tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e {
-			sleep 100
-			local `group_`group''label "`:var l `group_`group'''"
-			tabm `a'*  if `group_`group'', replace
-			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'.csv"
-			use `appended', clear
-			}
-		}
-
-	}
-
-/*------------------------------------------------------------------------------
-Part: Access to Health services
--------------------------------------------------------------------------------*/ 
-
-*Made into two parts because too many
-
-*set trace on
-local figvar_a f3_b f6_b f3_c f6_c f3_d f6_d 
-local fig_a 14.1 14.2 14.3 14.4 14.5 14.6
-
-local figvar_b f3_e f6_e g4 g9 g11
-local fig_b 14.7 14.8 14.9 14.10 14.11
-
-local figvar_b_m g12
-local fig_b_m 14.12
-
-
-foreach no in 14a {
-	forv x=1/6 {
-		use `appended', clear
-		local a: word `x' of `figvar_a'
-		local b: word `x' of `fig_a'
-		tabout `a' using "`b'.csv" if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e f h {
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-
-foreach no in 14b {
-	forv x=1/5 {
-		use `appended', clear
-		local a: word `x' of `figvar_b'
-		local b: word `x' of `fig_b'
-		tabout `a' using "`b'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e f h {
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-		
-	forval x=1/1 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_b_m'
-		local b: word `x' of `fig_b_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-	
-	
-	
-	}
-
-/*------------------------------------------------------------------------------
-Part: Impact on Mentah health and conflict
--------------------------------------------------------------------------------*/ 
-local figvar_m f8 f9 f12 f10
-local fig_m 15.1 15.2 15.3 15.4
-
-local figvar g4 f11
-local fig 15.5 15.6
-
-foreach no in 15 {
-	forval x=1/4 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e f g j {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-	forv x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		sleep 100
-		tabout `a' using "`b'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e f g j {
-			sleep 100
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, c(freq row) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}	
-	}
-	
-/*------------------------------------------------------------------------------
-Part: Impact on children (1)
--------------------------------------------------------------------------------*/ 
-*set trace on
-local figvar_m e7 e8 e14 e15 e10
-local fig_m 16.1 16.2 16.3 16.4 16.5
-
-local figvar f3_a f6_a
-local fig 16.6 16.7
-
-foreach no in 16 {
-	forval x=1/5 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-
-	forv x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e {
-			sleep 100
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, c(freq row) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-	
-	
-/*------------------------------------------------------------------------------
-Part: Impact on children (2)
--------------------------------------------------------------------------------*/ 
-
-local figvar_m h29 i9 i10 h30
-local fig_m 17.1 17.2 17.3 17.4
-
-foreach no in 17 {
-	forval x=1/4 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b d e g i {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-local figvar e16a e16b e16c e16d e16e
-local fig 17.5 17.6 17.7 17.8 17.9
-
-	forv x=1/5 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b d e g i {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
 
 /*------------------------------------------------------------------------------
 Part: Support from Government (1)
@@ -3117,33 +2482,46 @@ foreach no in 19 {
 		#delimit ;
 		eststo clear;
 		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
+		esttab using "`b'.csv", c("mean(f(%20.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
 		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
+
+		*Weighted - Analytical Weight*
+		sleep 100
+		use `appended', clear
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_* [aweight=weight_1];
+		esttab using "`b'_aw.csv", c("mean(f(%20.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'_aw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_aw") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'_aw.csv"
+		use `appended', clear
+
+		*Weighted - Frequency Weight*
+		sleep 100
+		use `appended', clear
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_* [fweight=weight_2_r];
+		esttab using "`b'_fw.csv", c("mean(f(%20.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'_fw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_fw") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'_fw.csv"
+		use `appended', clear
+				
 		}	
 
-local figvar c1b c1c c1d c5
-local fig 19.2 19.3 19.4 19.5
+	local figvar c1b c1c c1d c5
+	local fig 19.2 19.3 19.4 19.5
 
 	forv x=1/4 {
 		use `appended', clear
@@ -3155,17 +2533,23 @@ local fig 19.2 19.3 19.4 19.5
 		sleep 100
 		rm "`b'.csv"
 		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e g  {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
+
+		*Weighted - Analytical Weight*
+		tabout `a' using `b'_aw.csv if `a'!=96 [aweight=weight_1], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'_aw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_aw") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'_aw.csv"
+		use `appended', clear
+
+		*Weighted - Frequency Weight*
+		tabout `a' using `b'_fw.csv if `a'!=96 [fweight=weight_2_r], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'_fw.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_fw") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'_fw.csv"
+		use `appended', clear
+
 		}
 	*19.6: Assistance received
 	local figvar_q c3
@@ -3183,31 +2567,41 @@ local fig 19.2 19.3 19.4 19.5
 				}
 			tabm `a'*, replace
 			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
 			use `appended', clear
 			
-			*Based on Vulnerable groups*
-			foreach group in b c d e i {
-				sleep 100
-				local `group_`group''label "`:var l `group_`group'''"
-				*Treat Irrelevant as missing*
-				foreach I of varlist `a'* {
-					replace `I' =. if `I'==96
-					}
-				tabm `a'*  if `group_`group'', replace
-				la var _stack "`a'"
-				tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-				import delimited using "`b'.csv", varnames(1) clear
-				export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-				rm "`b'.csv"
-				use `appended', clear
+			local `a'label "`:var l `a''"
+			*Treat Irrelevant as missing*
+			foreach I of varlist `a'* {
+				replace `I' =. if `I'==96
 				}
+			tabm `a'* [aweight=weight_1], replace
+			la var _stack "`a'"
+			tabout _stack _values using "`b'_aw.csv"[aweight=_weight], c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+			import delimited using "`b'_aw.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_aw") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'_aw.csv"
+			use `appended', clear
+
+			local `a'label "`:var l `a''"
+			*Treat Irrelevant as missing*
+			foreach I of varlist `a'* {
+				replace `I' =. if `I'==96
+				}
+			tabm `a'* [fweight=weight_2_r], replace
+			la var _stack "`a'"
+			recast long _weight
+			tabout _stack _values using "`b'_fw.csv" [fweight=_weight], c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+			import delimited using "`b'_fw.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'_fw") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'_fw.csv"
+			use `appended', clear
 			}
 	}
-	
+=
 /*------------------------------------------------------------------------------
 Part: Support from Government (2)
 -------------------------------------------------------------------------------*/ 
@@ -3223,7 +2617,7 @@ foreach no in 20 {
 		#delimit ;
 		eststo clear;
 		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
+		esttab using "`b'.csv", c("mean(f(%20.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
 		import delimited using "`b'.csv", varnames(1) clear
@@ -3231,20 +2625,6 @@ foreach no in 20 {
 		rm "`b'.csv"
 		use `appended', clear
 		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
 		
 		}	
 
@@ -3275,314 +2655,4 @@ local fig 20.2 20.5
 		}
 	}
 
-/*------------------------------------------------------------------------------
-Part: Support from Government (3)
--------------------------------------------------------------------------------*/ 
-local figvar_m c9 c10
-local fig_m 21.1 21.2
 
-foreach no in 21 {
-	forval x=1/2 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-local figvar c11
-local fig 21.3
-
-	forv x=1/1 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' if c_check2==1 using "`b'.csv" , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			tabout `a' `group_`group'' if c_check2==1 using "`b'`group'.csv" , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-/*------------------------------------------------------------------------------
-Part: Managing Expenditure and food consumption
--------------------------------------------------------------------------------*/ 
-local figvar d11
-local fig 22.1
-
-foreach no in 22 {
-	forval x=1/1 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a';
-		esttab using "`b'.csv", c("mean(f(%20.4f))" ". sd(f(%20.4f))" ".  min(f(%20.4f))" ".   max(f(%20.4f))") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a';
-			esttab using "`b'`group'.csv",c("mean(f(%20.4f))" ". sd(f(%20.4f))" ".  min(f(%20.4f))" ".   max(f(%20.4f))") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-	}
-
-
-*set trace on
-/*------------------------------------------------------------------------------
-Part: Coping mechanism general
--------------------------------------------------------------------------------*/ 
-local figvar_m d12
-local fig_m 23.1
-
-foreach no in 23 {
-	forval x=1/1 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-
-local figvar hc21 hc22
-local fig 23.3 23.4
-
-	forv x=1/1 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-	
-/*------------------------------------------------------------------------------
-Part: Saving, Borrowing, Selling Asset
--------------------------------------------------------------------------------*/ 
-
-	local figvar_q d16
-	local fig_q 24.1
-foreach no in 24 {
-	forv x=1/1 {
-		use `appended', clear
-		local a: word `x' of `figvar_q'
-		local b: word `x' of `fig_q'
-		sleep 100
-		local `a'label "`:var l `a''"
-		tabm `a'*, replace
-		la var _stack "`a'"
-		tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-			
-		*Based on Vulnerable groups*
-		foreach group in b c d h i {
-			sleep 100
-			local `group_`group''label "`:var l `group_`group'''"
-			tabm `a'*  if `group_`group'', replace
-			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
-			import delimited using "`b'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'.csv"
-			use `appended', clear
-			}
-		}
-
-local figvar d17 d18
-local fig 24.2 24.3
-
-	forv x=1/2 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	
-	
-	}
-	
-/*------------------------------------------------------------------------------
-Part: Looking for job/additional job/opening business
--------------------------------------------------------------------------------*/ 
-
-
-local figvar_m h24
-local fig_m 25.1
-
-foreach no in 25 {
-	forval x=1/1 {
-		sleep 100
-		use `appended', clear
-		local a: word `x' of `figvar_m'
-		local b: word `x' of `fig_m'
-		#delimit ;
-		eststo clear;
-		eststo: qui: estpost summ `a'_*;
-		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
-		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
-		#delimit cr
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on vulnerable groups*
-		foreach group in b c d e g {
-			sleep 100
-			#delimit ;
-			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
-			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
-			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
-			#delimit cr
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			rm "`b'`group'.csv"
-			use `appended', clear	
-			}
-		
-		}	
-
-local figvar h16 h17
-local fig 25.2 25.2
-
-	forv x=1/1 {
-		use `appended', clear
-		local a: word `x' of `figvar'
-		local b: word `x' of `fig'
-		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
-		import delimited using "`b'.csv", varnames(1) clear
-		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
-		sleep 100
-		rm "`b'.csv"
-		use `appended', clear
-		
-		*Based on Vulnerable groups*
-		foreach group in b c d e g{
-			sleep 100
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
-			import delimited using "`b'`group'.csv", varnames(1) clear
-			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
-			sleep 100
-			rm "`b'`group'.csv"
-			use `appended', clear
-			}
-		}
-	}
-
-*Tes Commit*
