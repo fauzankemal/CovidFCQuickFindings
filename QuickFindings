@@ -2444,7 +2444,7 @@ forv x=1/2 {
 Part: Household Characteristics
 -------------------------------------------------------------------------------*/ 
 local figvar hc02 b2 hc01 b4 hc03 hc04 hc05 hc06 hc07 hc08 b9 hc10 hc11
-local fig 7.1 7.2 7.3 7.4 7.5 7.6 7.7 7.8 7.9 7.10 7.11
+local fig 7.1 7.2 7.3 7.4 7.5 7.6 7.7 7.8 7.9 7.10 7.11 7.12 7.13
 foreach no in 7 {
 	forv x=1/13 {
 		use `appended', clear
