@@ -2439,6 +2439,27 @@ forv x=1/2 {
 	rm "`b'.csv"
 	use `appended', clear
 	}
+	
+/*------------------------------------------------------------------------------
+Part: Household Characteristics
+-------------------------------------------------------------------------------*/ 
+local figvar hc02 b2 hc01 b4 hc03 hc04 hc05 hc06 hc07 hc08 b9 hc10 hc11
+local fig 7.1 7.2 7.3 7.4 7.5 7.6 7.7 7.8 7.9 7.10 7.11
+foreach no in 7 {
+	forv x=1/13 {
+		use `appended', clear
+		local a: word `x' of `figvar'
+		local b: word `x' of `fig'
+		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'.csv"
+		use `appended', clear
+		
+		}	
+
+}
 /*------------------------------------------------------------------------------
 Part: Biggest impact caused by COVID-19
 -------------------------------------------------------------------------------*/ 
