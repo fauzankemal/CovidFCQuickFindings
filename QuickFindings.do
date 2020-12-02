@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020 1 DES FINAL NONAME_Adjusted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -411,7 +411,7 @@ la var id12 "id12. Household found"
 
 *la var pengantar "Household willingness" 
 la var sint "Interview Start Time"
-
+/*
 la var a1 "a1. Full name of the household head"
 la var a2 "a2. Reason for the change of the household head "
 la var a3 "a3. Full name of the current household head "
@@ -423,7 +423,7 @@ la var a7_no "a7. Other phone number"
 la var a7_nama "a7. Owner for other phone number"
 *la var a10 "a10. Date of interview"
 la var a_check1 "a_check1. Check for household name "
-
+*/
 *la var bs "bs. Census block code"
 la var b1 "b1. Respondent relationship with household head"
 la var b2 "b2. HH head sex"
@@ -1103,12 +1103,14 @@ la de id12 1 "Yes" 2 "No", modify
 la val id12 id12
 la de a_check1 1 "Yes" 2 "No", modify
 la val a_check1 a_check1
+
+/*
 la de a2 1 "Death" 2 "Divorce" 3 "Migration" 4 "Others", modify
 la de a6 1 "Yes, there is" 96 "No", modify
 la val a6 a6
 la de a7 1 "Yes, there is" 96 "No", modify
 la val a7 a7
- 
+*/
 *MODULE B*
 la de b1 1 "I am the head of this household" 2 "Wife/husband" 3 "Child/stepchild/adopted child" 4 "Child-in-law" 5 "Grandchild" 6 "Mother/father or mother-/father-in-law"  95 "Other member of the household", modify
 la val b1 b1
