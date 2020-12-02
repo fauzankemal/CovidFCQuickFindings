@@ -1085,8 +1085,10 @@ la var d4x "d4x. Know: non-food expenses"
 la var d10x "d10x. Know: income changes"
 la var d11x "d11x. Know: income"
 la var h12x "h12x. Know: work hours"
+/*
 la var a6 "a6. Main phone number available"
 la var a7 "a7. Other phone number available"
+*/
 la var fint "Interview End Time"
 }
 
