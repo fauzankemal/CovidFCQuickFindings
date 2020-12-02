@@ -1741,7 +1741,7 @@ la de f10_g 100 "Yes" 0 "No", modify
 la val f10_g f10_g
 la de f10_h 100 "Yes" 0 "No", modify
 la val f10_h f10_h
-la de f11 1 "Yes" 2 "No" 97 "Refuse to answer", modify
+la de f11 1 "Yes" 2 "No" 7 "Refuse to answer", modify
 la val f11 f11
 la de f12_a 100 "Yes" 0 "No", modify
 la val f12_a f12_a
