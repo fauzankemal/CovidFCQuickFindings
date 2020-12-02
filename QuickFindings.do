@@ -2419,7 +2419,7 @@ local group_j "hc20"
 
 tempfile appended
 save `appended'
-/*
+
 
 /*------------------------------------------------------------------------------
 Part: Methodology
@@ -2850,7 +2850,7 @@ foreach no in 14b {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d e f h {
+		foreach group in b c d e g f h j {
 			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
@@ -3100,7 +3100,7 @@ local fig 17.5 17.6 17.7 17.8 17.9
 			}
 		}
 	}
-*/
+
 /*------------------------------------------------------------------------------
 Part: Support from Government (1)
 -------------------------------------------------------------------------------*/ 
@@ -3214,6 +3214,7 @@ foreach no in 19 {
 
 
 			*Based on Multiple categories vulnerable group*
+			set trace on
 			foreach group in g {
 				sleep 100
 				local `group_`group''label "`:var l `group_`group'''"
@@ -3226,12 +3227,12 @@ foreach no in 19 {
 				local count 0
 				foreach numval of local levels {
 					local count `count'+1
-					local labeling "`:val l `group_`group'' `numval''"
+					local labeling "`label: `:val l `group_`group''' `numval''"
 					if `count'==1 {
 						preserve
 						tabm `a'*  if `group_`group'' == `numval', replace
 						la var _stack "`a'"
-						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `labelling'")
+						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `numval'")
 						restore
 						}
 
@@ -3239,7 +3240,7 @@ foreach no in 19 {
 						preserve
 						tabm `a'*  if `group_`group'' == `numval', replace
 						la var _stack "`a'"
-						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) append botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `labelling'")
+						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) append botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `numval'")
 						restore
 					}
 				}
@@ -3250,7 +3251,7 @@ foreach no in 19 {
 			}
 		}
 	}
-=
+
 /*------------------------------------------------------------------------------
 Part: Support from Government (2)
 -------------------------------------------------------------------------------*/ 
