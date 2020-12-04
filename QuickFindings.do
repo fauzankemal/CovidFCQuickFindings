@@ -2323,10 +2323,13 @@ gen hc16=0 if d11x==1
 	replace hc16=3 if inrange(d11,2500000,4999999)
 	replace hc16=4 if inrange(d11,5000000,9999999)
 	replace hc16=5 if inrange(d11,10000000,89999999)
+	replace hc16=6 if d11x==997 
+	replace hc16=7 if d11x==998 | missing(d11x)
+
 	la var hc16 "hc16. Income groups"
-	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more", modify
+	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Refuse to answer" 7 "Don't know", modify
 	la val hc16 hc16
-	
+
 gen hc16a =0
 replace hc16a=0 if inrange(hc16,2,5)
 replace hc16a=1 if hc16==1
@@ -2825,12 +2828,22 @@ foreach no in 13 {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d e {
+		foreach group in b c d e f j {
 			sleep 100
 			local `group_`group''label "`:var l `group_`group'''"
+			*Treat Irrelevant as missing*
+			foreach I of varlist `a'* {
+				replace `I' =. if `I'==96
+				}
+			preserve
 			tabm `a'*  if `group_`group'', replace
 			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label'==1 ")
+			
+			restore
+			tabm `a'*  if !`group_`group'', replace
+			la var _stack "`a'"
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) append botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label'==0 ")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -2839,7 +2852,7 @@ foreach no in 13 {
 		}
 
 	}
-
+=
 /*------------------------------------------------------------------------------
 Part: Access to Health services
 -------------------------------------------------------------------------------*/ 
@@ -3271,21 +3284,66 @@ local fig 19.2 19.3 19.4 19.5
 			use `appended', clear
 			
 			*Based on Vulnerable groups*
-			foreach group in b c d e i {
+			foreach group in b c d e f j {
 				sleep 100
 				local `group_`group''label "`:var l `group_`group'''"
 				*Treat Irrelevant as missing*
 				foreach I of varlist `a'* {
 					replace `I' =. if `I'==96
 					}
+				preserve
 				tabm `a'*  if `group_`group'', replace
 				la var _stack "`a'"
-				tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+				tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label'==1 ")
+				
+				restore
+				tabm `a'*  if !`group_`group'', replace
+				la var _stack "`a'"
+				tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) append botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label'==0 ")
 				import delimited using "`b'.csv", varnames(1) clear
 				export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 				rm "`b'.csv"
 				use `appended', clear
 				}
+
+
+			*Based on Multiple categories vulnerable group*
+			set trace on
+			foreach group in g {
+				sleep 100
+				local `group_`group''label "`:var l `group_`group'''"
+				*Treat Irrelevant as missing*
+				foreach I of varlist `a'* {
+					replace `I' =. if `I'==96
+					}
+				
+				levelsof `group_`group'', local(levels)
+				local count 0
+				foreach numval of local levels {
+					local count `count'+1
+					local labeling "`label: `:val l `group_`group''' `numval''"
+					if `count'==1 {
+						preserve
+						tabm `a'*  if `group_`group'' == `numval', replace
+						la var _stack "`a'"
+						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `numval'")
+						restore
+						}
+
+					else {
+						preserve
+						tabm `a'*  if `group_`group'' == `numval', replace
+						la var _stack "`a'"
+						tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) append botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' == `numval'")
+						restore
+					}
+				}
+			import delimited using "`b'.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'.csv"
+			use `appended', clear
+			}
+		}
 			}
 	}
 	
