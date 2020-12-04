@@ -2483,11 +2483,37 @@ Part: Biggest impact caused by COVID-19
 *set trace on
 local figvar b10 
 local fig 9.1
+
+local figvar_2 b10 
+local fig_2 9.2
+
 foreach no in 9 {
 	forv x=1/1 {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
+		tabout `a' using `b'.csv , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on Vulnerable groups*
+		foreach group in b c d g j{
+			tabout `a' `group_`group'' using `b'`group'.csv , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			sleep 100
+			rm "`b'`group'.csv"
+			use `appended', clear
+			}
+		}	
+
+		forv x=1/1 {
+		use `appended', clear
+		local a: word `x' of `figvar_2'
+		local b: word `x' of `fig_2'
 		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
@@ -2506,6 +2532,7 @@ foreach no in 9 {
 			use `appended', clear
 			}
 		}	
+
 
 }
 
@@ -2791,7 +2818,7 @@ foreach no in 13 {
 		local `a'label "`:var l `a''"
 		tabm `a'*, replace
 		la var _stack "`a'"
-		tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+		tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
@@ -2803,7 +2830,7 @@ foreach no in 13 {
 			local `group_`group''label "`:var l `group_`group'''"
 			tabm `a'*  if `group_`group'', replace
 			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -2828,6 +2855,9 @@ local fig_b 14.7 14.8 14.9 14.10 14.11
 
 local figvar_b_m g12
 local fig_b_m 14.12
+
+local figvar_c_m f2 f3 f6 f7
+local fig_c_m 14.13 14.14 14.15 14.16
 
 
 foreach no in 14a {
@@ -2909,10 +2939,44 @@ foreach no in 14b {
 			}
 		
 		}	
-	
-	
-	
+
 	}
+
+
+	foreach no in 14c {
+		forval x=1/4 {
+		sleep 100
+		use `appended', clear
+		local a: word `x' of `figvar_c_m'
+		local b: word `x' of `fig_c_m'
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_*;
+		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on vulnerable groups*
+		foreach group in b c d e f h j {
+			sleep 100
+			#delimit ;
+			eststo clear;
+			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
+			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
+			#delimit cr
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'`group'.csv"
+			use `appended', clear	
+			}
+		
+		}
+	}	
 
 /*------------------------------------------------------------------------------
 Part: Impact on Mentah health and conflict
@@ -3200,7 +3264,7 @@ local fig 19.2 19.3 19.4 19.5
 				}
 			tabm `a'*, replace
 			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -3216,7 +3280,7 @@ local fig 19.2 19.3 19.4 19.5
 					}
 				tabm `a'*  if `group_`group'', replace
 				la var _stack "`a'"
-				tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+				tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
 				import delimited using "`b'.csv", varnames(1) clear
 				export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 				rm "`b'.csv"
@@ -3484,7 +3548,7 @@ foreach no in 24 {
 		local `a'label "`:var l `a''"
 		tabm `a'*, replace
 		la var _stack "`a'"
-		tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
+		tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a'")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
@@ -3496,7 +3560,7 @@ foreach no in 24 {
 			local `group_`group''label "`:var l `group_`group'''"
 			tabm `a'*  if `group_`group'', replace
 			la var _stack "`a'"
-			tabout _stack _values using "`b'.csv", c(freq col) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+			tabout _stack _values using "`b'.csv", c(freq row) clab(n pct) format(2) ptotal(none) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
