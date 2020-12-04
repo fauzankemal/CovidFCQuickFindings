@@ -99,7 +99,7 @@ replace d7_`x'=d7_`x'*100
 }
 
 *D8
-local i A B C D E F G H I W
+local i A B C D E F G H V W
 foreach x of local i{
 gen d8_`x'=regexm(d8,"`x'")
 replace d8_`x'=d8_`x'*100
@@ -700,7 +700,7 @@ la var d8_e "d8_e. Cash assistance from the government"
 la var d8_f "d8_f. Cash assistance from donators or NGOs"
 la var d8_g "d8_g. Scholarship money"
 la var d8_h "d8_h. Return on investment"
-la var d8_i "d8_i. Others"
+la var d8_v "d8_i. Others"
 la var d8_w "d8_w. No income at all"
 
 la var d12_a "d12_a. Borrowing money from relatives or friends"
@@ -1343,8 +1343,8 @@ la de d8_g 100 "Yes" 0 "No", modify
 la val d8_g d8_g
 la de d8_h 100 "Yes" 0 "No", modify
 la val d8_h d8_h
-la de d8_i 100 "Yes" 0 "No", modify
-la val d8_i d8_i
+la de d8_v 100 "Yes" 0 "No", modify
+la val d8_v d8_v
 la de d8_w 100 "Yes" 0 "No", modify
 la val d8_w d8_w
 la de d9 1 "Current income is higher than in January" 2 "Current income is the same or unchanged compared to January" 3 "Current income is lower than in January", modify
@@ -2317,7 +2317,7 @@ gen hc15 = e3>0 & !missing(e3)
 	la val hc15 hc15
 
 *Income groups
-gen hc16=0
+gen hc16=0 if d11x==1
 	replace hc16=1 if inrange(d11,1,999999)
 	replace hc16=2 if inrange(d11,1000000,2499999)
 	replace hc16=3 if inrange(d11,2500000,4999999)
@@ -2326,7 +2326,7 @@ gen hc16=0
 	la var hc16 "hc16. Income groups"
 	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more", modify
 	la val hc16 hc16
-
+	
 gen hc16a =0
 replace hc16a=0 if inrange(hc16,2,5)
 replace hc16a=1 if hc16==1
@@ -3103,7 +3103,7 @@ foreach no in 16 {
 		*Based on Vulnerable groups*
 		foreach group in b c d e {
 			sleep 100
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, c(freq row) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
+			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96, c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Joint Tabulation of `a' by ``group_`group''label' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			sleep 100

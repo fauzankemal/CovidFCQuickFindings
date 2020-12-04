@@ -2317,7 +2317,7 @@ gen hc15 = e3>0 & !missing(e3)
 	la val hc15 hc15
 
 *Income groups
-gen hc16=0
+gen hc16=0 if d11x==1
 	replace hc16=1 if inrange(d11,1,999999)
 	replace hc16=2 if inrange(d11,1000000,2499999)
 	replace hc16=3 if inrange(d11,2500000,4999999)
@@ -2388,6 +2388,12 @@ gen hc23= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1 | c3a==1 | c3
 	la var hc23 "hc23. Receive Assistance from Government"
 	la de hc23 0"Did not receive assitance" 1 "Receive assistance"
 	la val hc23 hc23
+
+gen hc23b= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1
+	la var hc23b "hc23. Receive Cash Assistance from Government"
+	la de hc23b 0"Did not receive assistance" 1 "Receive assistance"
+	la val hc23b hc23b
+ 
 
 *MB Gender*
 gen hc24= 2 if inlist(h3,4,6,8) | (h3==1 & b2==2) | (h3==2 & b2==1)
@@ -2526,7 +2532,7 @@ foreach no in PROSPERA {
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
 		use `appended', clear
-set trace on
+*set trace on
 		foreach x in d17 d18  {
 			local b "`x'_assistance"
 			tabout `x' hc23 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation `x' by receive assistance")
@@ -2541,3 +2547,22 @@ set trace on
 
 
 ***Venn Diagram PROSPERA***
+*D8
+/*
+local i A B C D E F G H I W
+foreach x of local i{
+replace d8_`x'=d8_`x'/100
+}
+*/
+
+gen d8_Job = regexm(d8,"[A-B]")
+la var d8_Job "Wage/Business"
+
+gen d8_Gvt = regexm(d8,"[E]")
+la var d8_Gvt "Government support"
+
+gen d8_Other = regexm(d8,"[CDFGHVW]")
+la var d8_Other "Other Source of Income"
+
+venndiag d8_Gvt  d8_Other  d8_Job , saving()
+
