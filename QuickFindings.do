@@ -2425,10 +2425,59 @@ local group_h "hc17"
 local group_i "hc16a" 
 local group_j "hc20"
 
+*PCA for wealth Index*
+foreach var of varlist d15* {
+	replace `var'=0 if `var'==2
+}
+
+pca d15a-d15l
+
+predict pca1_index
+
+xtile wealth_index = pca1_index, nq(5)
+la var wealth_index "5 Quintiles of Wealth Index"
+
+foreach var of varlist d15* {
+	replace `var'=2 if `var'==0
+}
+
+
+
 tempfile appended
 save `appended'
+=
 
+/*------------------------------------------------------------------------------
+Part: Wealth index tabulation
+-------------------------------------------------------------------------------*/ 
+local figvar wealth_index
+local fig wealth
+foreach no in Wealth {
+	forv x=1/1 {
+		use `appended', clear
+		local a: word `x' of `figvar'
+		local b: word `x' of `fig'
+		tabout `a' using `b'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 100
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on Vulnerable groups*
+		foreach group in b c d g j  {
 
+			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			sleep 100
+			rm "`b'`group'.csv"
+			use `appended', clear
+			}
+		}	
+
+}
+=
 /*------------------------------------------------------------------------------
 Part: Methodology
 -------------------------------------------------------------------------------*/ 
