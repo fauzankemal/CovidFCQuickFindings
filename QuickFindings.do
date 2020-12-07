@@ -2202,6 +2202,9 @@ la val j4 j4
 /*------------------------------------------------------------------------------
 Part: Household characteristics
 -------------------------------------------------------------------------------*/ 
+/*------------------------------------------------------------------------------
+Part: Household characteristics
+-------------------------------------------------------------------------------*/ 
 {
 gen hc01=0
 	replace hc01=1 if inrange(b3_usia,15,29)
@@ -2324,10 +2327,11 @@ gen hc16=0 if d11x==1
 	replace hc16=4 if inrange(d11,5000000,9999999)
 	replace hc16=5 if inrange(d11,10000000,89999999)
 	replace hc16=6 if d11x==997 
-	replace hc16=7 if d11x==998 | missing(d11x)
+	replace hc16=7 if d11x==998 
+	replace hc16=8 if missing(d11x)
 
 	la var hc16 "hc16. Income groups"
-	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Refuse to answer" 7 "Don't know", modify
+	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Refuse to answer" 7 "Don't know" 8 "No Working/Business Income", modify
 	la val hc16 hc16
 
 gen hc16a =0
@@ -2442,9 +2446,9 @@ foreach var of varlist d15* {
 }
 
 
-
 tempfile appended
 save `appended'
+
 =
 
 /*------------------------------------------------------------------------------
