@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020 1 DES FINAL NONAME_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings\Donor Request Tabulation"
 
@@ -2324,10 +2324,11 @@ gen hc16=0 if d11x==1
 	replace hc16=4 if inrange(d11,5000000,9999999)
 	replace hc16=5 if inrange(d11,10000000,89999999)
 	replace hc16=6 if d11x==997 
-	replace hc16=7 if d11x==998 | missing(d11x)
+	replace hc16=7 if d11x==998 
+	replace hc16=8 if missing(d11x)
 
 	la var hc16 "hc16. Income groups"
-	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Refuse to answer" 7 "Don't know", modify
+	la de hc16 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Refuse to answer" 7 "Don't know" 8 "No Working/Business Income", modify
 	la val hc16 hc16
 
 gen hc16a =0
@@ -2422,7 +2423,7 @@ gen im01=0
 	la var im01 "im01. Changes in income"
 	la de im01 8 "Don't have income from work/business" 1 "1-25% lower" 2 "26-50% lower" 3 "51-75% lower" 4 "76-100% lower" 5 "Lower, don't know the-%" 6 "Constant" 7 "Higher", modify
 	la val im01 im01
-
+}
 *HH  Default characteristics for for tabulation
 /* code
 a. all
@@ -2447,6 +2448,27 @@ local group_h "hc17"
 local group_i "hc16a" 
 local group_j "hc20"
 
+*PCA for wealth Index*
+foreach var of varlist d15* {
+	replace `var'=0 if `var'==2
+}
+
+pca d15a-d15l
+
+predict pca1_index
+
+xtile wealth_index = pca1_index, nq(5)
+la var wealth_index "5 Quintiles of Wealth Index"
+
+foreach var of varlist d15* {
+	replace `var'=2 if `var'==0
+}
+
+
+*Adjust Weight for Some Commands*
+gen sampling_weight_q = int(sampling_weight)
+recast long sampling_weight_q
+
 tempfile appended
 save `appended'
 
@@ -2456,30 +2478,31 @@ PROSPERA
 -------------------------------------------------------------------------------- */
 
 foreach no in PROSPERA {
-		
+		/*
 		local b "MB_ind"
-		tabout h10 using "`b'.csv" if hc16==0, c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of MB industry if no income")
+		tabout h10 using "`b'.csv" if hc16==0 [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of MB industry if no income")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
 		use `appended', clear
+		*/
 
 		local b "inc_gvt"
-		tabout d9 hc23 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Income reduction and receive gvt support")
+		tabout d9 hc23 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Income reduction and receive gvt support")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
 		use `appended', clear
 
 		local b "inc_ex"
-		tabout d9 d5 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Income reduction and receive gvt support")
+		tabout d9 d5 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Income reduction and receive gvt support")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
 		use `appended', clear
 
 		local b "MB_Gen"
-		tabout hc24 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of MB Gender")
+		tabout hc24 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of MB Gender")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
@@ -2487,7 +2510,7 @@ foreach no in PROSPERA {
 
 		foreach x in i5 i13 i14  {
 			local b "`x'_by_i1"
-			tabout `x' i1 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Business")
+			tabout `x' i1 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Business")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -2500,7 +2523,7 @@ foreach no in PROSPERA {
 				local b "i1_n_`a'"
 				#delimit ;
 				eststo clear;
-				bys `group':eststo: qui: estpost summ `a'_*;
+				bys `group':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
 				esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 				addnotes("Tabulation of `:var l `a'' by `:var l `group''") label nodepvars noobs replace plain;
 				#delimit cr
@@ -2517,7 +2540,7 @@ foreach no in PROSPERA {
 				local b "hc23_n_`a'"
 				#delimit ;
 				eststo clear;
-				bys `group':eststo: qui: estpost summ `a'_*;
+				bys `group':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
 				esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 				addnotes("Tabulation of `:var l `a'' by `:var l `group''") label nodepvars noobs replace plain;
 				#delimit cr
@@ -2530,7 +2553,7 @@ foreach no in PROSPERA {
 			}
 
 		local b "debt"
-		tabout d17 d18 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Debt before and after april 2020")
+		tabout d17 d18 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Debt before and after april 2020")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
@@ -2538,7 +2561,7 @@ foreach no in PROSPERA {
 *set trace on
 		foreach x in d17 d18  {
 			local b "`x'_assistance"
-			tabout `x' hc23 using "`b'.csv", c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation `x' by receive assistance")
+			tabout `x' hc23 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation `x' by receive assistance")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -2567,7 +2590,7 @@ la var d8_Gvt "Government support"
 gen d8_Other = regexm(d8,"[CDFGHVW]")
 la var d8_Other "Other Source of Income"
 
-venndiag d8_Gvt  d8_Other  d8_Job , saving()
+*venndiag d8_Gvt  d8_Other  d8_Job , saving()
 
 
 

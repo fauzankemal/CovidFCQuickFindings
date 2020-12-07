@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\covid_unicef_weighted_kirim_edit_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -3676,7 +3676,7 @@ foreach no in 24 {
 		use `appended', clear
 			
 		*Based on Vulnerable groups*
-		foreach group in b c d h i {
+		foreach group in b c d h j {
 			sleep 100
 			local `group_`group''label "`:var l `group_`group'''"
 			*Treat Irrelevant as missing*

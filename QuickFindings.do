@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\Survey Dampak Covid19 2020 1 DES FINAL NONAME_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -2481,7 +2481,7 @@ foreach no in Wealth {
 		}	
 
 }
-=
+
 /*------------------------------------------------------------------------------
 Part: Methodology
 -------------------------------------------------------------------------------*/ 
