@@ -2605,7 +2605,7 @@ forval x=1/2 {
 	local b: word `x' of `fig_m'
 	#delimit ;
 	eststo clear;
-	eststo: qui: estpost summ `a'_*;
+	eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 	esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 	addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 	#delimit cr
@@ -2619,7 +2619,7 @@ forval x=1/2 {
 	foreach group in b c d e j{
 		#delimit ;
 		eststo clear;
-		bys `group_`group'':eststo: qui: estpost summ `a'_*;
+		bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -2694,7 +2694,7 @@ foreach no in 10b {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -2708,7 +2708,7 @@ foreach no in 10b {
 		foreach group in b c d g j {
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -2734,7 +2734,7 @@ foreach no in 11a {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96 , c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		tabout `a' using "`b'.csv" if `a'!=96 [fweight=int(sampling_weight)], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		sleep 100
@@ -2764,7 +2764,7 @@ foreach no in 11b {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96, c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		tabout `a' using "`b'.csv" if `a'!=96 [fweight=int(sampling_weight)], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		sleep 100
@@ -2773,7 +2773,7 @@ foreach no in 11b {
 
 	*Based on Vulnerable groups*
 		foreach group in b c d g {
-			tabout `a' `group_`group'' using "`b'`group'.csv" if `a'!=96 , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=int(sampling_weight)] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			sleep 100
@@ -2801,7 +2801,7 @@ foreach no in 12 {
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
 		sleep 100
-		tabout `a' using "`b'.csv" if `a'!=96, c(freq col) clab(n pct) format(2) replace
+		tabout `a' using "`b'.csv" if `a'!=96 [fweight=int(sampling_weight)], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		rm "`b'.csv"
@@ -2826,7 +2826,7 @@ foreach no in 12 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -2840,7 +2840,7 @@ foreach no in 12 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -2977,7 +2977,7 @@ foreach no in 14b {
 		local b: word `x' of `fig_b_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -2991,7 +2991,7 @@ foreach no in 14b {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3014,7 +3014,7 @@ foreach no in 14b {
 		local b: word `x' of `fig_c_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3028,7 +3028,7 @@ foreach no in 14b {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3058,7 +3058,7 @@ foreach no in 15 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3072,7 +3072,7 @@ foreach no in 15 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3125,7 +3125,7 @@ foreach no in 16 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3139,7 +3139,7 @@ foreach no in 16 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3156,7 +3156,7 @@ foreach no in 16 {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
-		tabout `a' using "`b'.csv" if `a'!=96, cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		tabout `a' using "`b'.csv" if `a'!=96 [fweight=int(sampling_weight)], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
 		import delimited using "`b'.csv", varnames(1) clear
 		export excel using "undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 		sleep 100
@@ -3192,7 +3192,7 @@ foreach no in 17 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3206,7 +3206,7 @@ foreach no in 17 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3260,7 +3260,7 @@ foreach no in 19 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3274,7 +3274,7 @@ foreach no in 19 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3411,7 +3411,7 @@ foreach no in 20 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3425,7 +3425,7 @@ foreach no in 20 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3478,7 +3478,7 @@ foreach no in 21 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3492,7 +3492,7 @@ foreach no in 21 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3587,7 +3587,7 @@ foreach no in 23 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3601,7 +3601,7 @@ foreach no in 23 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
@@ -3721,7 +3721,7 @@ foreach no in 25 {
 		local b: word `x' of `fig_m'
 		#delimit ;
 		eststo clear;
-		eststo: qui: estpost summ `a'_*;
+		eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 		esttab using "`b'.csv", c("mean(f(%9.2f)) count") bracket
 		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
 		#delimit cr
@@ -3735,7 +3735,7 @@ foreach no in 25 {
 			sleep 100
 			#delimit ;
 			eststo clear;
-			bys `group_`group'':eststo: qui: estpost summ `a'_*;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=int(sampling_weight)];
 			esttab using "`b'`group'.csv", c("mean(f(%9.2f)) count") bracket
 			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
 			#delimit cr
