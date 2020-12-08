@@ -176,7 +176,7 @@ replace e15_`x'=e15_`x'*100
 }
 
 *F2
-local i A B C D E F G H
+local i A B C D E F G H I
 foreach x of local i{
 gen f2_`x'=regexm(f2,"`x'") if f1==1
 replace f2_`x'=f2_`x'*100
@@ -814,6 +814,7 @@ la var f2_e "f2_e. Puskesmas or pustu"
 la var f2_f "f2_f. Community-Resourced Health Initiative/UKBM"
 la var f2_g "f2_g. Traditional healing clinic, mantri"
 la var f2_h "f2_h. Pharmacy, laboratory, physical therapy clinic"
+la var f2_i "f2_i. Corona Test"
 
 la var f3_a "f3_a. Immunization"
 la var f3_b "f3_b. Birth control services (KB)"
@@ -2476,7 +2477,7 @@ save `appended'
 /*------------------------------------------------------------------------------
 PROSPERA
 -------------------------------------------------------------------------------- */
-
+/*
 foreach no in PROSPERA {
 		/*
 		local b "MB_ind"
@@ -2570,7 +2571,7 @@ foreach no in PROSPERA {
 			}
 		
 	}
-
+*/
 
 ***Venn Diagram PROSPERA***
 *D8
@@ -2589,8 +2590,10 @@ la var d8_Gvt "Government support"
 
 gen d8_Other = regexm(d8,"[CDFGHVW]")
 la var d8_Other "Other Source of Income"
-
-*venndiag d8_Gvt  d8_Other  d8_Job , saving()
-
+/*
+preserve
+keep d8_Gvt  d8_Other  d8_Job sampling_weight_q
+expand sampling_weight_q
+venndiag d8_Gvt  d8_Other  d8_Job
 
 
