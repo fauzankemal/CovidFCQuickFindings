@@ -99,7 +99,7 @@ replace d7_`x'=d7_`x'*100
 }
 
 *D8
-local i A B C D E F G H I W
+local i A B C D E F G H V W
 foreach x of local i{
 gen d8_`x'=regexm(d8,"`x'")
 replace d8_`x'=d8_`x'*100
@@ -700,7 +700,7 @@ la var d8_e "d8_e. Cash assistance from the government"
 la var d8_f "d8_f. Cash assistance from donators or NGOs"
 la var d8_g "d8_g. Scholarship money"
 la var d8_h "d8_h. Return on investment"
-la var d8_i "d8_i. Others"
+la var d8_v "d8_i. Others"
 la var d8_w "d8_w. No income at all"
 
 la var d12_a "d12_a. Borrowing money from relatives or friends"
@@ -1344,8 +1344,8 @@ la de d8_g 100 "Yes" 0 "No", modify
 la val d8_g d8_g
 la de d8_h 100 "Yes" 0 "No", modify
 la val d8_h d8_h
-la de d8_i 100 "Yes" 0 "No", modify
-la val d8_i d8_i
+la de d8_v 100 "Yes" 0 "No", modify
+la val d8_v d8_v
 la de d8_w 100 "Yes" 0 "No", modify
 la val d8_w d8_w
 la de d9 1 "Current income is higher than in January" 2 "Current income is the same or unchanged compared to January" 3 "Current income is lower than in January", modify
@@ -2582,7 +2582,7 @@ replace d8_`x'=d8_`x'/100
 }
 */
 
-gen d8_Job = regexm(d8,"[A-B]")
+gen d8_Job = regexm(d8,"[AB]")
 la var d8_Job "Wage/Business"
 
 gen d8_Gvt = regexm(d8,"[E]")
@@ -2590,7 +2590,7 @@ la var d8_Gvt "Government support"
 
 gen d8_Other = regexm(d8,"[CDFGHVW]")
 la var d8_Other "Other Source of Income"
-/*
+
 preserve
 keep d8_Gvt  d8_Other  d8_Job sampling_weight_q
 expand sampling_weight_q
