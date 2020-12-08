@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted_rev1.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -2457,7 +2457,7 @@ recast long sampling_weight_q
 tempfile appended
 save `appended'
 
-/*
+
 /*------------------------------------------------------------------------------
 Part: Wealth index tabulation
 -------------------------------------------------------------------------------*/ 
@@ -3080,7 +3080,7 @@ foreach no in 14b {
 
 
 	}
-=
+
 
 	foreach no in 14c {
 		forval x=1/4 {
