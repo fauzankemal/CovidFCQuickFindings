@@ -2392,6 +2392,12 @@ la var hc22 "hc22. Nonfood expenditure groups"
 la de hc22 0 "None" 1 "Under 0.25 millions" 2 "0.25-0.5 millions" 3 "0.5-1 millions" 4 "1-2 millions" 5 "2 millions or more", modify
 la val hc22 hc22
 
+gen hc23= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1  /*c3a==1 | c3b==1 | c3c==1 | c3d==1*/
+	la var hc23 "hc23. Receive Assistance from Government"
+	la de hc23 0"Did not receive assitance" 1 "Receive assistance"
+	la val hc23 hc23
+
+
 *Income Changes*
 *Percentage of income changes
 gen im01=0
@@ -2457,7 +2463,7 @@ recast long sampling_weight_q
 tempfile appended
 save `appended'
 
-
+=
 /*------------------------------------------------------------------------------
 Part: Wealth index tabulation
 -------------------------------------------------------------------------------*/ 
