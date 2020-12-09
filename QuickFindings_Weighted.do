@@ -2465,6 +2465,32 @@ save `appended'
 
 =
 /*------------------------------------------------------------------------------
+Part: Social Assistance value summary
+-------------------------------------------------------------------------------*/
+local figvar c12
+local fig b1
+*Sort by cash bansos received*
+foreach no in Bansos {
+	forval x=1/1 {
+		sleep 1
+		use `appended', clear
+		local a: word `x' of `figvar'
+		local b: word `x' of `fig'
+		#delimit ;
+		eststo clear;
+		bys c1a_*: eststo: qui: estpost summ `a' [fweight=sampling_weight_q];
+		esttab using "`b'.csv", c("mean(f(%20.4f))" ". p50(f(%20.4f))  count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'.csv"
+		use `appended', clear
+		}
+	}
+=
+
+/*------------------------------------------------------------------------------
 Part: Wealth index tabulation
 -------------------------------------------------------------------------------*/ 
 local figvar wealth_index

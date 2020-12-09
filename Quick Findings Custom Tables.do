@@ -2590,7 +2590,7 @@ la var d8_Gvt "Government support"
 
 gen d8_Other = regexm(d8,"[CDFGHVW]")
 la var d8_Other "Other Source of Income"
-
+=
 preserve
 keep d8_Gvt  d8_Other  d8_Job sampling_weight_q
 expand sampling_weight_q
