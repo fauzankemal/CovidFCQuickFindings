@@ -29,7 +29,7 @@ j. rural-urban
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_Adjusted_rev1.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_REV__Adjusted.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -2402,6 +2402,8 @@ gen hc24= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1 | c3a==1 | c3
 	la de hc24 0"Did not receive assitance" 1 "Receive assistance"
 	la val hc24 hc24
 
+
+
 *Social Assistance ant crosstab*
 gen PKH = inrange(c1b,1,2)
 gen BPJS = c1c==1
@@ -2422,6 +2424,16 @@ la var hc25 "No. of Gvt Social Assistance Received"
 la de hc25 0 "Zero" 1 "One" 2 "Two" 3 "Three" 4 "Four or more"
 la val hc25 hc25
 
+gen exp = (d3*4)+d4
+la var exp "Total Monthly Expenditure"
+gen hc26 = 6
+	replace hc26=1 if inrange(d11,1,999999)
+	replace hc26=2 if inrange(d11,1000000,2499999)
+	replace hc26=3 if inrange(d11,2500000,4999999)
+	replace hc26=4 if inrange(d11,5000000,9999999)
+	replace hc26=5 if inrange(d11,10000000,89999999)
+	la de hc26 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Don't know", modify
+	la val hc26 hc26
 
 foreach var of varlist c1a_* {
 	replace `var'=100 if `var'==1
@@ -2480,6 +2492,7 @@ i. low income
 j. rural-urban
 k. Wealth index
 l. No. of Social Assistance
+m. Expenditure Groups
 */
 local group_b "hc19"
 local group_c "hc12"
@@ -2493,15 +2506,15 @@ local group_i "hc16a"
 local group_j "hc20"
 local group_k "wealth_index"
 local group_l "hc25"
+local group_m "hc26"
 
 
 
-=
+
 
 
 tempfile appended
 save `appended'
-
 
 /*------------------------------------------------------------------------------
 Part: Social Assistance value & Index summary
@@ -2543,7 +2556,7 @@ foreach no in Bansos {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in k  {
+		foreach group in k m  {
 
 			tabout `a' `group_`group'' using `b'`group'.csv [fweight=sampling_weight_q], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
@@ -2554,7 +2567,7 @@ foreach no in Bansos {
 			}
 		}	
 	}
-
+=
 
 /*------------------------------------------------------------------------------
 Part: Wealth index tabulation
