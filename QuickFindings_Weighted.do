@@ -2469,7 +2469,7 @@ pca d15a-d15l
 
 predict pca1_index
 
-xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(5)
+xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(10)
 la var wealth_index "10 Quintiles of Wealth Index"
 
 foreach var of varlist d15* {
@@ -2507,10 +2507,6 @@ local group_j "hc20"
 local group_k "wealth_index"
 local group_l "hc25"
 local group_m "hc26"
-
-
-
-
 
 
 tempfile appended
@@ -2567,7 +2563,7 @@ foreach no in Bansos {
 			}
 		}	
 	}
-=
+
 
 /*------------------------------------------------------------------------------
 Part: Wealth index tabulation
