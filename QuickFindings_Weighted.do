@@ -10,7 +10,7 @@ Author          : Fauzan Kemal Musthofa, Michelle A
 Project         : 2020_UNDP_COVID
 Email           : fkemal@smeru.or.id, mandrina@smeru.or.id
 Date created	: 02/11/2020
-Date modified	: 30/11/2020
+Date modified	: 18/12/2020
 --------------------------------------------------------------------------------
 Simple tabulations and summary for Fullscale-survey's quick finding analysis
 -------------------------------------------------------------------------------- */
@@ -49,12 +49,16 @@ gen c1a_`x'=regexm(c1a,"`x'")
 replace c1a_`x'= c1a_`x'*100
 }
 
+order c1a_A-c1a_W, after(c1a)
+
 *C2
 local i A B C D E F G H I J
 foreach x of local i{
 gen c2_`x'=regexm(c2,"`x'") 
 replace c2_`x'=c2_`x'*100
 }
+
+order c2_A-c2_J, after(c2)
 
 *C6a
 local i A B C D V
@@ -63,12 +67,18 @@ gen c6a_`x'=regexm(c6a,"`x'") if inlist(c6,1,2)
 replace c6a_`x'=c6a_`x'*100
 }
 
+order c6a_A-c6a_V, after(c6a)
+
 *C6b
 local i A B C D E F V
 foreach x of local i{
 gen c6b_`x'=regexm(c6b,"`x'") if inlist(c6,3,4)
 replace c6b_`x'=c6b_`x'*100
 }
+
+order c6b_A-c6b_V, after(c6b)
+
+
 
 *C9
 local i A B C D W
@@ -77,12 +87,16 @@ gen c9_`x'=regexm(c9,"`x'")
 replace c9_`x'=c9_`x'*100
 }
 
+order c9_A-c9_W, after(c9)
+
 *C10
 local i A B C D E W
 foreach x of local i{
 gen c10_`x'=regexm(c10,"`x'")
 replace c10_`x'=c10_`x'*100
 }
+
+order c10_A-c10_W, after(c10)
 
 *D6
 local i A B C D E F G H I J V
@@ -91,12 +105,16 @@ gen d6_`x'=regexm(d6,"`x'") if d5==1
 replace d6_`x'=d6_`x'*100 
 }
 
+order d6_A-d6_V, after(d6)
+
 *D7
 local i A B C D E F G H I J V
 foreach x of local i{
 gen d7_`x'=regexm(d7,"`x'") if d5==3
 replace d7_`x'=d7_`x'*100
 }
+
+order d7_A-d7_V, after(d7)
 
 *D8
 local i A B C D E F G H V W
@@ -105,12 +123,16 @@ gen d8_`x'=regexm(d8,"`x'")
 replace d8_`x'=d8_`x'*100
 }
 
+order d8_A-d8_W, after(d8)
+
 *D12
 local i A B C D E F G H I J K L W
 foreach x of local i{
 gen d12_`x'=regexm(d12,"`x'")
 replace d12_`x'=d12_`x'*100
 }
+
+order d12_A-d12_W, after(d12)
 
 *E5
 local i A B C D E F V
@@ -119,12 +141,17 @@ gen e5_`x'=regexm(e5,"`x'") if e4==2
 replace e5_`x'=e5_`x'*100
 }
 
+order e5_A-e5_V, after(e5)
+
 *E6
 local i A B C D E F G V W
 foreach x of local i{
 gen e6_`x'=regexm(e6,"`x'") if e_check2==1
 replace e6_`x'=e6_`x'*100
 }
+
+order e6_A-e6_W, after(e6)
+
 
 *E7
 local i A B C D E F G H I J W
@@ -133,12 +160,16 @@ gen e7_`x'=regexm(e7,"`x'") if e_check2==1
 replace e7_`x'=e7_`x'*100
 }
 
+order e7_A-e7_W, after(e7)
+
 *E8
 local i A B C D E F W
 foreach x of local i{
 gen e8_`x'=regexm(e8,"`x'") if e_check2==1
 replace e8_`x'=e8_`x'*100
 }
+
+order e8_A-e8_W, after(e8)
 
 *E10
 local i A B C D E F G H W
@@ -147,12 +178,16 @@ gen e10_`x'=regexm(e10,"`x'") if !regexm(e9,"D") & !missing(e9)
 replace e10_`x'=e10_`x'*100
 }
 
+order e10_A-e10_W, after(e10)
+
 *E11
 local i A B C D E F G H I J W
 foreach x of local i{
 gen e11_`x'=regexm(e11,"`x'") if !regexm(e10,"H|W") & !missing(e10)
 replace e11_`x'=e11_`x'*100
 }
+
+order e11_A-e11_W, after(e11)
 
 *E13
 local i A B C D E F G H I J K
@@ -161,12 +196,16 @@ gen e13_`x'=regexm(e13,"`x'") if e12==1
 replace e13_`x'=e13_`x'*100
 }
 
+order e13_A-e13_K, after(e13)
+
 *E14
 local i A B W
 foreach x of local i{
 gen e14_`x'=regexm(e14,"`x'") if e_check2==1
 replace e14_`x'=e14_`x'*100
 }
+
+order e14_A-e14_W, after(e14)
 
 *E15
 local i A B C D E F G H I J K L
@@ -175,12 +214,16 @@ gen e15_`x'=regexm(e15,"`x'") if e_check2==1 & regexm(e14,"A|B")
 replace e15_`x'=e15_`x'*100
 }
 
+order e15_A-e15_L, after(e15)
+
 *F2
 local i A B C D E F G H
 foreach x of local i{
 gen f2_`x'=regexm(f2,"`x'") if f1==1
 replace f2_`x'=f2_`x'*100
 }
+
+order f2_A-f2_H, after(f2)
 
 *F3
 local i A B C D E F G H I
@@ -189,12 +232,16 @@ gen f3_`x'=regexm(f3,"`x'") if f1==1
 replace f3_`x'=f3_`x'*100
 }
 
+order f3_A-f3_I, after(f3)
+
 *F6
 local i A B C D E F G H I
 foreach x of local i{
 gen f6_`x'=regexm(f6,"`x'") if f5==1
 replace f6_`x'=f6_`x'*100
 }
+
+order f6_A-f6_I, after(f6)
 
 *F7
 local i A B C D E F G H
@@ -203,12 +250,16 @@ gen f7_`x'=regexm(f7,"`x'") if f5==1
 replace f7_`x'=f7_`x'*100
 }
 
+order f7_A-f7_H, after(f7)
+
 *F8
 local i A B C D E F G H V W
 foreach x of local i{
 gen f8_`x'=regexm(f8,"`x'")
 replace f8_`x'=f8_`x'*100
 }
+
+order f8_A-f8_W, after(f8)
 
 *F9
 local i A B C D E Y
@@ -217,12 +268,16 @@ gen f9_`x'=regexm(f9,"`x'") if !regexm(f8,"W") & !missing(f8)
 replace f9_`x'=f9_`x'*100
 }
 
+order f9_A-f9_Y, after(f9)
+
 *F10
 local i A B C D E F G H
 foreach x of local i{
 gen f10_`x'=regexm(f10,"`x'") if !regexm(f8,"W") & !missing(f8)
 replace f10_`x'=f10_`x'*100
 }
+
+order f10_A-f10_H, after(f10)
 
 *F12
 local i A B C D E F G H I X
@@ -231,12 +286,16 @@ gen f12_`x'=regexm(f12,"`x'") if f11==1
 replace f12_`x'=f12_`x'*100
 }
 
+order f12_A-f12_X, after(f12)
+
 *G1
 local i A B C D E F G H X Y
 foreach x of local i{
 gen g1_`x'=regexm(g1,"`x'")
 replace g1_`x'=g1_`x'*100
 }
+
+order g1_A-g1_Y, after(g1)
 
 *G2
 local i A B C D
@@ -245,12 +304,16 @@ gen g2_`x'=regexm(g2,"`x'") if !regexm(g1,"X|Y")
 replace g2_`x'=g2_`x'*100
 }
 
+order g2_A-g2_D, after(g2)
+
 *G3
 local i A B C
 foreach x of local i{
 gen g3_`x'=regexm(g3,"`x'") if !regexm(g2,"A") & !missing(g2)
 replace g3_`x'=g3_`x'*100
 }
+
+order g3_A-g3_C, after(g3)
 
 *G5
 local i A B C D E F V W
@@ -259,12 +322,17 @@ gen g5_`x'=regexm(g5,"`x'") if !regexm(g1,"X|Y")
 replace g5_`x'=g5_`x'*100
 }
 
+order g5_A-g5_W, after(g5)
+
+
 *G6
 local i A B C D E Y
 foreach x of local i{
 gen g6_`x'=regexm(g6,"`x'") if !regexm(g5,"W") & !missing(g5)
 replace g6_`x'=g6_`x'*100
 }
+
+order g6_A-g6_Y, after(g6)
 
 *G8
 local i A B C D E F G V
@@ -273,12 +341,16 @@ gen g8_`x'=regexm(g8,"`x'") if g7==1
 replace g8_`x'=g8_`x'*100
 }
 
+order g8_A-g8_V, after(g8)
+
 *G10
 local i A B C D E F G H V
 foreach x of local i{
 gen g10_`x'=regexm(g10,"`x'") if g9==1
 replace g10_`x'=g10_`x'*100
 }
+
+order g10_A-g10_V, after(g10)
 
 *G12
 local i A B C D E F V
@@ -287,12 +359,16 @@ gen g12_`x'=regexm(g12,"`x'") if g11==1
 replace g12_`x'=g12_`x'*100
 }
 
+order g12_A-g12_V, after(g12)
+
 *H1
 local i A B C D E F G H I W
 foreach x of local i{
 gen h1_`x'=regexm(h1,"`x'")
 replace h1_`x'=h1_`x'*100
 }
+
+order h1_A-h1_W, after(h1)
 
 *H24
 local i A B C D E F W
@@ -301,12 +377,16 @@ gen h24_`x'=regexm(h24,"`x'")
 replace h24_`x'=h24_`x'*100
 }
 
+order h24_A-h24_W, after(h24)
+
 *H26
 local i A B C D E Y W
 foreach x of local i{
 gen h26_`x'=regexm(h26,"`x'") if (!regexm(h24,"W") & h25==1)
 replace h26_`x'=h26_`x'*100
 }
+
+order h26_A-h26_W, after(h26)
 
 *H29
 local i A B C
@@ -315,12 +395,16 @@ gen h29_`x'=regexm(h29,"`x'") if !regexm(h29,"W")
 replace h29_`x'=h29_`x'*100
 }
 
+order h29_A-h29_C, after(h29)
+
 *H30
 local i A B C D E F G H I
 foreach x of local i{
 gen h30_`x'=regexm(h30,"`x'") if !regexm(h29,"C|W")
 replace h30_`x'=h30_`x'*100
 }
+
+order h30_A-h30_I, after(h30)
 
 *I3
 local i A B C D E F V
@@ -329,12 +413,16 @@ gen i3_`x'=regexm(i3,"`x'") if i1!=5
 replace i3_`x'=i3_`x'*100
 }
 
+order i3_A-i3_V, after(i3)
+
 *I6
 local i A B C D E F V
 foreach x of local i{
 gen i6_`x'=regexm(i6,"`x'") if i1!=5
 replace i6_`x'=i6_`x'*100
 }
+
+order i6_A-i6_V, after(i6)
 
 *I7
 local i A B C D E F G H I J V W
@@ -343,12 +431,16 @@ gen i7_`x'=regexm(i7,"`x'") if i1!=5
 replace i7_`x'=i7_`x'*100
 }
 
+order i7_A-i7_W, after(i7)
+
 *I8
 local i A B C D E F G H I J K L M N V W
 foreach x of local i{
 gen i8_`x'=regexm(i8,"`x'") if i1!=5 & !regexm(i7,"W")
 replace i8_`x'=i8_`x'*100
 }
+
+order i8_A-i8_W, after(i8)
 
 *I9
 local i A B C
@@ -357,12 +449,16 @@ gen i9_`x'=regexm(i9,"`x'") if i1!=5
 replace i9_`x'=i9_`x'*100
 }
 
+order i9_A-i9_C, after(i9)
+
 *I10
 local i A B C D
 foreach x of local i{
 gen i10_`x'=regexm(i10,"`x'") if !regexm(i9,"C") & !missing(i9)
 replace i10_`x'=i10_`x'*100
 }
+
+order i10_A-i10_D, after(i10)
 
 *I11
 local i A B C D E F G H I J K L M
@@ -371,6 +467,8 @@ gen i11_`x'=regexm(i11,"`x'") if i1!=5
 replace i11_`x'=i11_`x'*100
 }
 
+order i11_A-i11_M, after(i11)
+
 *I12
 local i A B C D E F G H I J W
 foreach x of local i{
@@ -378,12 +476,16 @@ gen i12_`x'=regexm(i12,"`x'") if i1!=5
 replace i12_`x'=i12_`x'*100
 }
 
+order i12_A-i12_W, after(i12)
+
 *I15
 local i A B C D E F G V
 foreach x of local i{
 gen i15_`x'=regexm(i15,"`x'") if i14<4 & !missing(i14)
 replace i15_`x'=i15_`x'*100
 }
+
+order i15_A-i15_V, after(i15)
 
 rename a* b* c* d* e* f* g* h* i*, lower
 }
@@ -2198,6 +2300,8 @@ la de j4 1 "Yes" 2 "No", modify
 la val j4 j4
 }
 
+save "datasurvei_18dec", replace
+
 
 /*------------------------------------------------------------------------------
 Part: Household characteristics
@@ -2426,13 +2530,15 @@ la val hc25 hc25
 
 gen exp = (d3*4)+d4
 la var exp "Total Monthly Expenditure"
-gen hc26 = 6
+la var exp "Total Monthly Expenditure (Group)"
+gen hc26 = 0
 	replace hc26=1 if inrange(d11,1,999999)
 	replace hc26=2 if inrange(d11,1000000,2499999)
 	replace hc26=3 if inrange(d11,2500000,4999999)
 	replace hc26=4 if inrange(d11,5000000,9999999)
 	replace hc26=5 if inrange(d11,10000000,89999999)
-	la de hc26 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Don't know", modify
+	replace hc26=6 if missing(d11)
+	la de hc26 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Don't know/refuse", modify
 	la val hc26 hc26
 
 foreach var of varlist c1a_* {
@@ -2465,14 +2571,15 @@ foreach var of varlist d15* {
 	replace `var'=0 if `var'==2
 }
 
-pca d15a-d15l
+pca d15a-d15l [fw=sampling_weight_q]
+
 
 predict pca1_index
 
 xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(5)
 la var wealth_index "Quintiles of Wealth Index"
-la de wealth_index 1 "1 (Poorest 20%)" 2 "2" 3 "3" 4 "4" 5 "5 (Wealthiest 20%)"
-la val wealth_index wealth_index
+la de wealth_index 1 "1 (Poorest)" 2 "2" 3 "3" 4 "4" 5 "5 (Wealthiest)"
+*la val wealth_index wealth_index
 
 foreach var of varlist d15* {
 	replace `var'=2 if `var'==0
@@ -3987,7 +4094,9 @@ local fig 26.1 26.2 26.3 26.4
 local figvar_m e6
 local fig_m 26.5
 
-	forv x=1/2 {
+foreach no in 26 {
+
+	forv x=1/4 {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
@@ -3999,9 +4108,9 @@ local fig_m 26.5
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d e g{
+		foreach group in b c d e g j {
 			sleep 1
-			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			tabout `a' `group_`group'' using `b'`group'.csv [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
 			sleep 1
@@ -4009,4 +4118,38 @@ local fig_m 26.5
 			use `appended', clear
 			}
 		}
+	
+	forval x=1/1 {
+		sleep 1
+		use `appended', clear
+		local a: word `x' of `figvar_m'
+		local b: word `x' of `fig_m'
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
+		esttab using "`b'.csv", c("mean(f(%20.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on vulnerable groups*
+		foreach group in b c d e g j {
+			sleep 1
+			#delimit ;
+			eststo clear;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
+			esttab using "`b'`group'.csv", c("mean(f(%20.2f)) count") bracket
+			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
+			#delimit cr
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'`group'.csv"
+			use `appended', clear	
+			}
+		
+		}
+
 	}
