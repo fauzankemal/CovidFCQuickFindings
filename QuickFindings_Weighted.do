@@ -2469,8 +2469,10 @@ pca d15a-d15l
 
 predict pca1_index
 
-xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(10)
-la var wealth_index "10 Quintiles of Wealth Index"
+xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(5)
+la var wealth_index "Quintiles of Wealth Index"
+la de wealth_index 1 "1 (Poorest 20%)" 2 "2" 3 "3" 4 "4" 5 "5 (Wealthiest 20%)"
+la val wealth_index wealth_index
 
 foreach var of varlist d15* {
 	replace `var'=2 if `var'==0
@@ -2518,8 +2520,8 @@ Part: Social Assistance value & Index summary
 local figvar_s c12
 local fig_s b1
 
-local figvar hc23 c1a_a c1a_b c1a_c c1a_d c3a c3b c3c c3d c1b
-local fig s1 s2 s3 s4 s5 s6 s7 s8 s9 s10
+local figvar hc23 hc24 c1a_a c1a_b c1a_c c1a_d c3a c3b c3c c3d c1b c5 c1c c1d
+local fig s1 s2 s3 s4 s5 s6 s7 s8 s9 s10 s11 s12 s13 s14
 *Sort by cash bansos received*
 foreach no in Bansos {
 	forval x=1/1 {
@@ -2540,7 +2542,7 @@ foreach no in Bansos {
 		}
 	
 
-	forv x=1/10 {
+	forv x=1/14 {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
@@ -3949,9 +3951,9 @@ foreach no in 25 {
 		}	
 
 local figvar h16 h17
-local fig 25.2 25.2
+local fig 25.2 25.3
 
-	forv x=1/1 {
+	forv x=1/2 {
 		use `appended', clear
 		local a: word `x' of `figvar'
 		local b: word `x' of `fig'
@@ -3975,4 +3977,36 @@ local fig 25.2 25.2
 		}
 	}
 
-*Tes Commit*
+/*------------------------------------------------------------------------------
+Part: Distribution of Role in Households
+-------------------------------------------------------------------------------*/ 
+
+local figvar b11 b12 b13 b14
+local fig 26.1 26.2 26.3 26.4
+
+local figvar_m e6
+local fig_m 26.5
+
+	forv x=1/2 {
+		use `appended', clear
+		local a: word `x' of `figvar'
+		local b: word `x' of `fig'
+		tabout `a' using `b'.csv [fweight=sampling_weight_q], cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a''")
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		sleep 1
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on Vulnerable groups*
+		foreach group in b c d e g{
+			sleep 1
+			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			sleep 1
+			rm "`b'`group'.csv"
+			use `appended', clear
+			}
+		}
+	}
