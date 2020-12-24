@@ -813,8 +813,8 @@ la var d12_e "d12_e. Seeking/applying for assistance from the government"
 la var d12_f "d12_f. Seeking/applying for assistance from nongovernmental parties"
 la var d12_g "d12_g. Using severance or savings"
 la var d12_h "d12_h. Changing the allocation of consumption"
-la var d12_i "d12_i. Reduce food expenditures"
-la var d12_j "d12_j. Reduce non-food expenditures"
+la var d12_i "d12_i. Reducing food expenditures"
+la var d12_j "d12_j. Reducing non-food expenditures"
 la var d12_k "d12_k. Selling or pawning belongings"
 la var d12_l "d12_l. None of the above"
 la var d12_w "d12_w. Not applicable because the household’s needs are met"
@@ -1238,7 +1238,7 @@ la de b8dx 1 "Yes, I know" 98 "Don't know", modify
 la val b8dx b8dx
 la de b9 1 "Yes, around this house" 2 "No one" 8 "Don't know", modify
 la val b9 b9
-la de b10 1 "Loss of job/reduced income" 2 "An increase in workload and household chores" 3 "Disturbance in physical health conditions" 4 "Disturbance in mental health (stressed)" 5 "Child’s education being interrupted" 6 "Difficulties in accessing healthcare services, including children’s growth and development ones"  7 "Difficulties in accessing other public services"  8 "Loss of family member"  95 "Others" 96 "None", modify
+la de b10 1 "Loss of job/reduced income" 2 "Increased workload and household chores" 3 "Worsened physical health" 4 "Worsened mental health" 5 "Disrupted child’s education" 6 "Interrupted access to healthcare services"  7 "Interrupted access to other public services"  8 "Loss of family member"  95 "Others" 96 "None", modify
 la val b10 b10
 la de b11 1 "Household head" 2 "Wife/husband of the household head" 3 "Son or son-in-law of the household head" 4 "Daughter or daughter-in-law of the household head" 5 "Father or father-in-law of the household head" 6 "Mother or mother-in-law of the household head"  7 "Another household member"  8 "Divided equally among all household members"  9 "Household helper/assistant" 96 "Others/not a member of this household", modify
 la val b11 b11
@@ -2271,7 +2271,7 @@ la de i12_w 100 "Yes" 0 "No", modify
 la val i12_w i12_w
 la de i13 1 "Yes, I can" 2 "No, I can’t" 3 "There is no due date for installment payment", modify
 la val i13 i13
-la de i14 1 "Receive cash assistance for UMKM (BLT UMKM/BPUM)" 2 "Receive debt relaxations" 3 "Receive both cash assistance and debt relaxations" 4 " Know of, but did not receive it" 5 "Know of, but do not know how to apply " 6 "Know of, but did not apply because it is not needed "  7 "Don’t know about any assistance", modify
+la de i14 1 "Receive cash assistance for UMKM (BLT UMKM/BPUM)" 2 "Receive debt relaxations" 3 "Receive both cash assistance and debt relaxations" 4 "Aware, but do not receive it" 5 "Aware, but do not know how to apply" 6 "Aware, but do not apply because it is not needed"  8 "Unaware of any assistance", modify
 la val i14 i14
 la de i15_a 100 "Yes" 0 "No", modify
 la val i15_a i15_a
@@ -2579,7 +2579,7 @@ predict pca1_index
 xtile wealth_index = pca1_index [fw=sampling_weight_q], nq(5)
 la var wealth_index "Quintiles of Wealth Index"
 la de wealth_index 1 "1 (Poorest)" 2 "2" 3 "3" 4 "4" 5 "5 (Wealthiest)"
-*la val wealth_index wealth_index
+la val wealth_index wealth_index
 
 foreach var of varlist d15* {
 	replace `var'=2 if `var'==0

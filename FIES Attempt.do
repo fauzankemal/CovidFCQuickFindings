@@ -39,10 +39,10 @@ la val wealth_index wealth_index
 drop id
 gen id = _n
 *Sample for FAO*
-keep id1_cd id1 id5 b2 b4 b6 wealth_index WORRIED HEALTHY FEWFOOD SKIPPED ATELESS RUNOUT HUNGRY WHLDAY sampling_weight
+keep id id1_cd id1 id5 b2 b4 b6 wealth_index WORRIED HEALTHY FEWFOOD SKIPPED ATELESS RUNOUT HUNGRY WHLDAY sampling_weight
 
 
-sample 20, by(id1_cd id1 id5 b2 b4 b6 wealth_index)
+sample 12.1, by(id1_cd id1 id5 b2 b4 b6 wealth_index)
 
 =
 *RASCH TEST
