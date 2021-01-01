@@ -26,6 +26,8 @@ g. Income group
 h. pregnant
 i. low income
 j. rural-urban
+k. Wealth index
+k2. Wealth index 3 group
 */
 
 /*Kemal*/
@@ -3985,7 +3987,7 @@ foreach no in 23 {
 		use `appended', clear
 		
 		*Based on vulnerable groups*
-		foreach group in b c d e g k2 {
+		foreach group in b c d e g j k2 {
 			sleep 1
 			#delimit ;
 			eststo clear;
