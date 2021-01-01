@@ -42,7 +42,7 @@ gen id = _n
 keep id id1_cd id1 id5 b2 b4 b6 wealth_index WORRIED HEALTHY FEWFOOD SKIPPED ATELESS RUNOUT HUNGRY WHLDAY sampling_weight
 
 
-sample 12.1, by(id1_cd id1 id5 b2 b4 b6 wealth_index)
+sample 20, by(id1_cd id1 id5 b2 b4 b6 wealth_index)
 
 =
 *RASCH TEST
