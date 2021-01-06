@@ -28,6 +28,22 @@ i. low income
 j. rural-urban
 */
 
+local group_b "hc19"
+local group_c "hc12"
+local group_d "hc13"
+local group_cd "hc13b"
+local group_e "hc14"
+local group_f "hc15"
+local group_g "hc16"
+local group_h "hc17"
+local group_i "hc16a" 
+local group_j "hc20"
+local group_j2 "hc20a"
+local group_k "wealth_index"
+local group_k2 "wealth_group"
+local group_l "hc25"
+local group_m "hc26"
+
 /*Kemal*/
 use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings\datasurvei_21dec_grouped.dta"
 
@@ -36,6 +52,27 @@ cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questi
 *Modify label value i1*
 la de i1 1 "Yes, a male member of the household" 2 "Yes, a female member of the household" 3 "Yes, operating it together" 4 "Yes, operated by someone else not a member of this household" 5 "No", modify
 la val i1 i1
+
+*Savings Dummy*
+gen hc27 = !inlist(d14,5)
+la var hc27 "Have Savings/liquid assets"
+la de hc27 1 "Have savings/liquid assets" 0 "No savings/liquid assets"
+la val hc27 hc27
+
+gen hc28 = !inlist(d17,4) & !inlist(d18,4)
+la var hc28 "Have Debt Before/After April"
+la de hc28 1 "Have debt" 0 "No debt"
+la val hc28 hc28
+
+gen debtbeforeapril = !inlist(d17,4)
+la var debtbeforeapril "Have Debt Before April 2020"
+la de debtbeforeapril 1 "Have debt before April 2020" 0 "No debt before April 2020"
+la val debtbeforeapril debtbeforeapril
+
+gen debtafterapril = !inlist(d18,4)
+la var debtafterapril "Have debt after April 2020"
+la de debtafterapril 1 "Have debt after April 2020" 0 "No debt after April 2020"
+la val debtafterapril debtafterapril
 
 tempfile appended
 save `appended', replace
@@ -137,8 +174,112 @@ foreach no in PROSPERA {
 			use `appended', clear
 			
 			}
+
+
+		foreach x in d17 d18   {
+			local b "`x'_by_hc27"
+			tabout `x' hc27 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
+			import delimited using "`b'.csv", varnames(1) clear
+			export excel using "weighted_undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'.csv"
+			use `appended', clear
+			}
+
+		foreach x in d17 d18  debtbeforeapril debtafterapril  {
+			local b "`x'_by_hc27"
+			tabout `x' hc27 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
+			import delimited using "`b'.csv", varnames(1) clear
+			export excel using "weighted_undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'.csv"
+			use `appended', clear
+			}
+
+		foreach x in hc23 debtbeforeapril  {
+			local b "`x'_by_debtafter"
+			tabout `x' debtafterapril using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Debt, Social assistance ")
+			import delimited using "`b'.csv", varnames(1) clear
+			export excel using "weighted_undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'.csv"
+			use `appended', clear
+			}
+
+set trace on
+	local figvar_m c2
+	local fig_m 20.1
+		forval x=1/1 {
+		sleep 1
+		use `appended', clear
+		local a: word `x' of `figvar_m'
+		local b: word `x' of `fig_m'
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q] if c1a_c;
+		esttab using "`b'.csv", c("mean(f(%20.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'.csv"
+		use `appended', clear
 		
+		*Based on vulnerable groups*
+		foreach group in k2 {
+			sleep 1
+			#delimit ;
+			eststo clear;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q] if c1a_c;
+			esttab using "`b'`group'.csv", c("mean(f(%20.2f)) count") bracket
+			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
+			#delimit cr
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'`group'.csv"
+			use `appended', clear	
+			}
+		
+		}	
+
+	local figvar_m c2
+	local fig_m 20.2
+		forval x=1/1 {
+		sleep 1
+		use `appended', clear
+		local a: word `x' of `figvar_m'
+		local b: word `x' of `fig_m'
+		#delimit ;
+		eststo clear;
+		eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q] if c1a_c & hc25==1;
+		esttab using "`b'.csv", c("mean(f(%20.2f)) count") bracket
+		addnotes("Tabulation of `:var l `a''") label nodepvars noobs replace plain;
+		#delimit cr
+		import delimited using "`b'.csv", varnames(1) clear
+		export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
+		rm "`b'.csv"
+		use `appended', clear
+		
+		*Based on vulnerable groups*
+		foreach group in k2 {
+			sleep 1
+			#delimit ;
+			eststo clear;
+			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q] if c1a_c & hc25==1;
+			esttab using "`b'`group'.csv", c("mean(f(%20.2f)) count") bracket
+			addnotes("Tabulation of `:var l `a'' by `:var l `group_`group'''") label nodepvars noobs replace plain;
+			#delimit cr
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'`group'.csv"
+			use `appended', clear	
+			}
+		
+		}	
+
+
+
 	}
+
+
+
 /*
 
 ***Venn Diagram PROSPERA***
