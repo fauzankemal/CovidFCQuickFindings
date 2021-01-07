@@ -3047,8 +3047,8 @@ Part: Impact on Household Small Business
 local figvar i1 i2 i4 i13
 local fig 12.1 12.2 12.3 12.4
 
-local figvar_m i3 i7 i8 i12
-local fig_m 12.5 12.6 12.7 12.8
+local figvar_m i3 i7 i8 i12 i15
+local fig_m 12.5 12.6 12.7 12.8 12.9
 
 foreach no in 12 {
 
@@ -3064,7 +3064,7 @@ foreach no in 12 {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d e {
+		foreach group in b c d e k2{
 			sleep 1
 			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
@@ -3075,7 +3075,7 @@ foreach no in 12 {
 		}
 
 
-	forval x=1/4 {
+	forval x=1/5 {
 		sleep 1
 		use `appended', clear
 		local a: word `x' of `figvar_m'
@@ -3092,7 +3092,7 @@ foreach no in 12 {
 		use `appended', clear
 		
 		*Based on vulnerable groups*
-		foreach group in b c d e {
+		foreach group in b c d e k2{
 			sleep 1
 			#delimit ;
 			eststo clear;
