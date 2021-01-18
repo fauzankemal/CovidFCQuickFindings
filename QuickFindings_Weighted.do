@@ -23,6 +23,7 @@ d. disability
 e. elder
 f. children aged below 5 years old
 g. Income group
+g2. Low income group
 h. pregnant
 i. low income
 j. rural-urban
@@ -31,7 +32,7 @@ k2. Wealth index 3 group
 */
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_REV__Adjusted.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Data\Final\FIXXX\DATA SURVEI COVID19_REV (CEK SMERU)_WEIGHT_REV__Adjusted_060121.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings"
 
@@ -2525,7 +2526,7 @@ gen hc24= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1 | c3a==1 | c3
 *Social Assistance ant crosstab*
 gen PKH = inrange(c1b,1,2)
 gen BPJS = c1c==1
-gen BPUM = c1d==1
+gen Prakerja = c1d==1
 gen sembako = c3a==1
 gen pulsa = c3b==1
 gen tax = c3c==1 
@@ -2536,7 +2537,7 @@ foreach var of varlist c1a_* {
 	replace `var'=1 if `var'==100
 }
 
-egen hc25 = rowtotal(c1a_a c1a_b c1a_c c1a_d PKH BPJS BPUM sembako pulsa tax credit PLN)
+egen hc25 = rowtotal(c1a_a c1a_b c1a_c c1a_d PKH BPJS Prakerja sembako pulsa tax credit PLN)
 replace hc25 = 4 if hc25>4
 la var hc25 "No. of Gvt Social Assistance Received"
 la de hc25 0 "Zero" 1 "One" 2 "Two" 3 "Three" 4 "Four or more"
@@ -2554,6 +2555,13 @@ gen hc26 = 0
 	replace hc26=6 if missing(exp)
 	la de hc26 0 "None" 1 "Under 1 million" 2 "1-2.5 millions" 3 "2.5-5 millions" 4 "5-10 millions" 5 "10 millions or more" 6 "Don't know/refuse", modify
 	la val hc26 hc26
+
+
+gen hcr1 = d9==3
+la var hcr1 "Lower income dummy"
+la de hcr1 1 "Income lower" 0 "Income higher/stays the same"
+la val hcr1 hcr1
+
 
 foreach var of varlist c1a_* {
 	replace `var'=100 if `var'==1
@@ -2619,6 +2627,7 @@ cd. Children disability
 e. elder
 f. children aged below 5 years old
 g. Income group
+g2. Low income group
 h. pregnant
 i. low income
 j. rural-urban
@@ -2635,6 +2644,7 @@ local group_cd "hc13b"
 local group_e "hc14"
 local group_f "hc15"
 local group_g "hc16"
+local group_g2 "hcr1"
 local group_h "hc17"
 local group_i "hc16a" 
 local group_j "hc20"
@@ -2645,7 +2655,7 @@ local group_l "hc25"
 local group_m "hc26"
 
 
-save "datasurvei_21dec_grouped", replace
+save "datasurvei_070121_grouped", replace
 tempfile appended
 save `appended'
 
@@ -2932,7 +2942,7 @@ foreach no in 10b {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d g j {
+		foreach group in b c d g j k2{
 			sleep 1
 			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
@@ -2961,7 +2971,7 @@ foreach no in 10b {
 		use `appended', clear
 		
 		*Based on vulnerable groups*
-		foreach group in b c d g j {
+		foreach group in b c d g j k2{
 			#delimit ;
 			eststo clear;
 			bys `group_`group'':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
@@ -2998,7 +3008,7 @@ foreach no in 11a {
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d g {
+		foreach group in b c d g k2{
 			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
@@ -3028,7 +3038,7 @@ foreach no in 11b {
 		use `appended', clear
 
 	*Based on Vulnerable groups*
-		foreach group in b c d g {
+		foreach group in b c d g k2{
 			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
 			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
@@ -3694,7 +3704,7 @@ foreach no in 19 {
 		use `appended', clear
 		
 		*Based on vulnerable groups*
-		foreach group in b c d e g {
+		foreach group in b c d e j {
 			sleep 1
 			#delimit ;
 			eststo clear;
@@ -3725,7 +3735,7 @@ local fig 19.2 19.3 19.4 19.5
 		use `appended', clear
 		
 		*Based on Vulnerable groups*
-		foreach group in b c d e g  {
+		foreach group in b c d e j  {
 			sleep 1
 			tabout `a' `group_`group'' using `b'`group'.csv if `a'!=96 [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
 			import delimited using "`b'`group'.csv", varnames(1) clear
@@ -4070,7 +4080,7 @@ local fig 23.3 23.4
 		}
 	}
 	
-*/
+
 /*------------------------------------------------------------------------------
 Part: Saving, Borrowing, Selling Asset
 -------------------------------------------------------------------------------*/ 
@@ -4318,5 +4328,83 @@ foreach no in 26 {
 			}
 		
 		}
+
+	}
+
+
+/*------------------------------------------------------------------------------
+Part: Request_Sector and lower income
+-------------------------------------------------------------------------------*/ 
+local figvar h10 h11
+local fig sec1 sec2 
+
+local figvar2 h15
+local fig2 sec3 
+
+local figvar_m i7
+local fig_m sec4
+
+
+foreach no in sector {
+
+	forv x=1/2 {
+		use `appended', clear
+		local a: word `x' of `figvar'
+		local b: word `x' of `fig'
+		
+		*Based on Vulnerable groups*
+		foreach group in g2 {
+			sleep 1
+			tabout `a' `group_`group'' using `b'`group'.csv [fweight=sampling_weight_q] , cell(freq row) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group_`group''' ")
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			sleep 1
+			rm "`b'`group'.csv"
+			use `appended', clear
+			}
+		}
+
+	
+
+		forv x=1/1 {
+		use `appended', clear
+		local a: word `x' of `figvar2'
+		local b: word `x' of `fig2'
+		
+		*Based on Vulnerable groups*
+		foreach group in h11 {
+			sleep 1
+			tabout `a' `group' using `b'`group'.csv [fweight=sampling_weight_q] , cell(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of `:var l `a'' by `:var l `group'' ")
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			sleep 1
+			rm "`b'`group'.csv"
+			use `appended', clear
+			}
+		}
+
+	forval x=1/1 {
+		sleep 1
+		use `appended', clear
+		local a: word `x' of `figvar_m'
+		local b: word `x' of `fig_m'
+		
+		*Based on vulnerable groups*
+		foreach group in i4 {
+			sleep 1
+			#delimit ;
+			eststo clear;
+			bys `group':eststo: qui: estpost summ `a'_* [fweight=sampling_weight_q];
+			esttab using "`b'`group'.csv", c("mean(f(%20.2f)) count") bracket
+			addnotes("Tabulation of `:var l `a'' by `:var l `group'' ") label nodepvars noobs replace plain;
+			#delimit cr
+			import delimited using "`b'`group'.csv", varnames(1) clear
+			export excel using "Weighted_undpunicef20_quickfinding_`no'.xlsx", sheet("`b'`group'") cell(C1) sheetmodify firstrow(varlabels)
+			rm "`b'`group'.csv"
+			use `appended', clear	
+			}
+		
+		}	
+
 
 	}
