@@ -45,7 +45,7 @@ local group_l "hc25"
 local group_m "hc26"
 
 /*Kemal*/
-use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings\datasurvei_21dec_grouped.dta"
+use "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings\datasurvei_250121_grouped.dta"
 
 cd "G:\My Drive\Documents\SMERU\Kuestioner COVID (UNDP-UNICEF)\Full Scale Questionnaire\Quick Findings\Donor Request Tabulation"
 
@@ -54,15 +54,15 @@ la de i1 1 "Yes, a male member of the household" 2 "Yes, a female member of the 
 la val i1 i1
 
 *Savings Dummy*
-gen hc27 = !inlist(d14,5)
-la var hc27 "Have Savings/liquid assets"
-la de hc27 1 "Have savings/liquid assets" 0 "No savings/liquid assets"
-la val hc27 hc27
+gen hc61 = !inlist(d14,5)
+la var hc61 "Have Savings/liquid assets"
+la de hc61 1 "Have savings/liquid assets" 0 "No savings/liquid assets"
+la val hc61 hc61
 
-gen hc28 = !inlist(d17,4) & !inlist(d18,4)
-la var hc28 "Have Debt Before/After April"
-la de hc28 1 "Have debt" 0 "No debt"
-la val hc28 hc28
+gen hc62 = !inlist(d17,4) & !inlist(d18,4)
+la var hc62 "Have Debt Before/After April"
+la de hc62 1 "Have debt" 0 "No debt"
+la val hc62 hc62
 
 gen debtbeforeapril = !inlist(d17,4)
 la var debtbeforeapril "Have Debt Before April 2020"
@@ -177,8 +177,8 @@ foreach no in PROSPERA {
 
 
 		foreach x in d17 d18   {
-			local b "`x'_by_hc27"
-			tabout `x' hc27 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
+			local b "`x'_by_hc61"
+			tabout `x' hc61 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "weighted_undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
@@ -186,8 +186,8 @@ foreach no in PROSPERA {
 			}
 
 		foreach x in d17 d18  debtbeforeapril debtafterapril  {
-			local b "`x'_by_hc27"
-			tabout `x' hc27 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
+			local b "`x'_by_hc61"
+			tabout `x' hc61 using "`b'.csv" [fweight=sampling_weight_q], c(freq col) clab(n pct) format(2) replace botf(tes.txt) botstr("Tabulation of Savings and Debt")
 			import delimited using "`b'.csv", varnames(1) clear
 			export excel using "weighted_undp20_quickfinding_`no'.xlsx", sheet("`b'") cell(C1) sheetmodify firstrow(varlabels)
 			rm "`b'.csv"
