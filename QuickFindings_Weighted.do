@@ -2620,6 +2620,15 @@ foreach var of varlist d15* {
 	replace `var'=2 if `var'==0
 }
 
+gen debt = 1 if d17==1 | d18==1
+replace debt = 2 if d17==2 | d18==2
+replace debt = 3 if d17==3 | d18==3
+replace debt = 4 if d17==4 | d18==4
+la var debt "Have debt?"
+la de debt 1  "Yes, can pay the installments regularly" 2  "Yes, can not pay the installments regularly" 3 "Yes, the installment is currenly deferred" 4 "no debt"
+la val debt debt
+
+
 
 *HH  Default characteristics for for tabulation
 /* code
