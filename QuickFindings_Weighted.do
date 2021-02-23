@@ -2514,16 +2514,24 @@ la val hc22 hc22
 
 gen hc23= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1 
 	la var hc23 "hc23. Receive cash Assistance from Government"
-	la de hc23 0"Did not receive assitance" 1 "Receive assistance"
+	la de hc23 0"Did not receive cash assitance" 1 "Receive cash assistance"
 	la val hc23 hc23
 
 gen hc24= regexm(c1a,"[A-D]") | inrange(c1b,1,2) | c1c==1 | c1d==1 | c3a==1 | c3b==1 | c3c==1 | c3d==1 | c5==1
 	la var hc24 "hc24. Receive any Assistance from Government"
-	la de hc24 0"Did not receive assitance" 1 "Receive assistance"
+	la de hc24 0"Did not receive any assitance" 1 "Receive any assistance"
 	la val hc24 hc24
 
+gen hc24b = c3a==1 | c3b==1 | c3c==1 | c3d==1 | c5==1
+	la var hc24b "hc24b. Receive non-cash Assistance from Government"
+	la de hc24b 0"Did not receive non-cash assitance" 1 "Receive non-cash assistance"
+	la val hc24b hc24b	
 
-
+gen hc24c = hc23 & hc24b
+	la var hc24c "hc24c. Receive both cash and non-cash assistance from Government"
+	la de hc24c 0"Did not receive assitance" 1 "Receive assistance"
+	la val hc24c hc24c
+		
 *Social Assistance ant crosstab*
 gen PKH = inrange(c1b,1,2)
 gen BPJS = c1c==1
@@ -2560,6 +2568,8 @@ gen hc26 = 0
 gen hc27 = b15!=96
 la var hc27 "Household Used internet"
 la de hc27 1 "Used internet" 0 "No internet"
+
+
 
 gen hcr1 = d9==3
 la var hcr1 "Lower income dummy"
