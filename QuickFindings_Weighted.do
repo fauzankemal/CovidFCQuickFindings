@@ -292,7 +292,7 @@ replace f12_`x'=f12_`x'*100
 order f12_A-f12_X, after(f12)
 
 *G1
-local i A B C D E F G H X Y
+local i A B C D E F G H W Y
 foreach x of local i{
 gen g1_`x'=regexm(g1,"`x'")
 replace g1_`x'=g1_`x'*100
@@ -995,7 +995,7 @@ la var g1_e "g1_e. Having difficulty or problems with memory or concentration"
 la var g1_f "g1_f. Having behavioral and/or emotional problems"
 la var g1_g "g1_g. Having difficulty or problems with speaking and/or understanding/communication with others"
 la var g1_h "g1_h. Having difficulty or problems to take care of oneself "
-la var g1_x "g1_x. Not applicable (no one with disabilities)"
+la var g1_w "g1_w. Not applicable (no one with disabilities)"
 la var g1_y "g1_y. Don’t know"
 
 la var g2_a "g2_a. Toddlers (2-4 years old)"
@@ -1889,8 +1889,8 @@ la de g1_g 100 "Yes" 0 "No", modify
 la val g1_g g1_g
 la de g1_h 100 "Yes" 0 "No", modify
 la val g1_h g1_h
-la de g1_x 100 "Yes" 0 "No", modify
-la val g1_x g1_x
+la de g1_w 100 "Yes" 0 "No", modify
+la val g1_w g1_w
 la de g1_y 100 "Yes" 0 "No", modify
 la val g1_y g1_y
 la de g2_a 100 "Yes" 0 "No", modify
@@ -2639,6 +2639,10 @@ la de debt 1  "Yes, can pay the installments regularly" 2  "Yes, can not pay the
 la val debt debt
 
 
+gen business = inrange(i1,1,4)
+la var business "Owning business"
+la de business 1 "Have business" 0 "No business"
+la val business business
 
 *HH  Default characteristics for for tabulation
 /* code
